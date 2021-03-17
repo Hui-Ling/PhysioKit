@@ -45,6 +45,6 @@ Compute R peaks from the channel named 'PPG'. The R peaks detection results are 
 
 > python get_rpeaks.py -i subj1_run1.vhdr -o 'preprocessed_file/subj1' -c 'ppg' -p       
 
-Compute R peaks from the channel named 'ppg'. The R peaks detection results and the figures are saved in ./reprocessed_file/subj1. 
+Compute R peaks from the channel named 'ppg'. The R peaks detection results and the figures are saved in ./preprocessed_file/subj1. 
 
    
