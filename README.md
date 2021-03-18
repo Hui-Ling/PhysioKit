@@ -45,7 +45,7 @@ Option to plot time series of heart rate and detected R peaks
 
 ##### 1. preprocessed signals:
 
-[OUTPUT_DIR]/[CHANNEL_NAME]/signal/[CHANNEL_NAME]_preproc_[INPUT_FILE name]
+[OUTPUT_DIR]/[CHANNEL_NAME]/signal/[CHANNEL_NAME]_ preproc_[INPUT_FILE name]
 
 1. csv file: raw ppg signals, filtered ppg signals, heart rate, and detected r peaks
 2. txt file: the indices (start from 0) and time (unit:second) of every detected r peaks
