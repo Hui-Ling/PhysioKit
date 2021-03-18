@@ -26,24 +26,24 @@ Process PPG file to get R peaks.
 
 #### Arguments:
 
-#####-h, --help
+##### -h, --help
 Show this help message and exit
   
-#####-i INPUT_FILE, --input_file INPUT_FILE
+##### -i INPUT_FILE, --input_file INPUT_FILE
 Path to PPG file. (The extension of INPUT_FILE must be .acq or .vhdr)
                         
-#####-o OUTPUT_DIR, --output_dir OUTPUT_DIR
+##### -o OUTPUT_DIR, --output_dir OUTPUT_DIR
 Directory to store output files. default: ./output
                         
-#####-c CHANNEL_NAME, --channel_name CHANNEL_NAME
+##### -c CHANNEL_NAME, --channel_name CHANNEL_NAME
 Name of PPG channel. default: PPG
                         
-#####-p, --plot
+##### -p, --plot
 Option to plot time series of heart rate and detected R peaks
   
 #### Outputs:
 
-#####1. preprocessed signals:
+##### 1. preprocessed signals:
 
 [OUTPUT_DIR]/[CHANNEL_NAME]/signal/[CHANNEL_NAME]_preproc_[INPUT_FILE name]
 
@@ -52,7 +52,7 @@ Option to plot time series of heart rate and detected R peaks
 3. pkl file: including the information in csv and txt files
 
 
-#####2. figures (only if set up the argument -p):
+##### 2. figures (only if set up the argument -p):
 
 1. [CHANNEL_NAME]/fig/hr/[INPUT_FILE name]_hr.png: time series of heart rate
 
