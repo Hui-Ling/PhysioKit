@@ -258,10 +258,10 @@ def run(input_file, target_channel, output_dir, isplot):
     target_data['signals'] = np.squeeze(physio['data'])
     target_data['times'] = np.arange(0, max(physio['data'].shape) / sampling_rate, 1 / sampling_rate)
 
-    preproc_dir = output_dir / "preproc" / target_channel.lower()
-    preproc_fname_pkl = preproc_dir / (target_channel.lower() + "_preproc_" + file_name + ".pkl")
-    preproc_fname_csv = preproc_dir / (target_channel.lower() + "_preproc_" + file_name + ".csv")
-    preproc_fname_txt = preproc_dir / (target_channel.lower() + "_preproc_" + file_name + ".txt")
+    preproc_dir = output_dir / target_channel / "signal"
+    preproc_fname_pkl = preproc_dir / (target_channel + "_preproc_" + file_name + ".pkl")
+    preproc_fname_csv = preproc_dir / (target_channel + "_preproc_" + file_name + ".csv")
+    preproc_fname_txt = preproc_dir / (target_channel + "_preproc_" + file_name + ".txt")
 
     if not preproc_fname_pkl.exists():
 
@@ -284,7 +284,7 @@ def run(input_file, target_channel, output_dir, isplot):
     if isplot:
         print("Rpeak processing: Plotting time series of heart rate...")
 
-        fig_dir = output_dir / "fig"
+        fig_dir = output_dir / target_channel / "fig"
 
         (fig_dir / "hr").mkdir(parents=True, exist_ok=True)
         (fig_dir / "rpeak").mkdir(parents=True, exist_ok=True)
