@@ -43,7 +43,7 @@ def load_brainvision(file, target_channel):
     raw = mne.io.read_raw_brainvision(file)
     raw.set_channel_types({'ECG': 'ecg', 'HEOG': 'eog', 'VEOG': 'eog','PPG':'ecg'}, verbose=None)
     print(raw.info)
-
+    print("Targeted channel name: %s"%target_channel)
     raw.pick_channels(target_channel)
     data = dict()
     data['data'] = raw.get_data()
