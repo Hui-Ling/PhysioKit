@@ -2,6 +2,7 @@
 # coding: utf-8
 import pandas as pd
 import scipy.io
+from scipy import stats
 from pathlib import Path
 import biosppy
 from myio import *
@@ -99,19 +100,42 @@ def event_identify(x, sampling_rate):
     # 20210312: added to remove the peaks with amplitude relatively lower than the previous and the next peaks
     peaks = np.array(list(map(lambda x: int(x), peaks)))
     ind = 1
+    removed_peak = 0
     while ind < len(peaks) - 2:
-        if (x[peaks[ind]] < x[peaks[ind + 1]] * 0.5) and (x[peaks[ind]] < x[peaks[ind - 1]] * 0.5):
-            local_avg_diff = np.mean(np.diff(peaks[max(0, (ind - 10)):min(len(peaks) - 1, (ind + 10))]))
-            local_std_diff = np.std(np.diff(peaks[max(0, (ind - 10)):min(len(peaks) - 1, (ind + 10))]))
-            thres = local_avg_diff - 2*local_std_diff
-            # check if the interval between peaks is really too short
-            if (peaks[ind + 1] - peaks[ind]) < thres or (peaks[ind] - peaks[ind - 1]) < thres:
+        if x[peaks[ind]] < (x[peaks[ind + 1]] * 0.5) and x[peaks[ind]] < (x[peaks[ind - 1]] * 0.5):
+            diff_seg = np.diff(peaks[max(0, (ind - 10)):min(len(peaks) - 1, (ind + 10))])
+            # Compute suitable range of RR interval from local RRI sequence (replaced mean and std with iqr to reduce effect of outliers 2021.03.22)
+            # local_avg_diff = np.mean(diff_seg)
+            # local_std_diff = np.std(diff_seg)
+            Q1 = np.percentile(diff_seg, 25, interpolation='midpoint')
+            Q3 = np.percentile(diff_seg, 75, interpolation='midpoint')
+            local_iqrd_diff = stats.iqr(diff_seg, interpolation='midpoint')/2
+            thres = Q1 - local_iqrd_diff
+
+            #print("ignore %f"%peaks[ind])
+
+            # check if the interval is in the normal range when discarding this peak (added 2021.03.22)
+            if (peaks[ind + 1] - peaks[ind - 1]) > Q1 and (peaks[ind + 1] - peaks[ind - 1]) < Q3:
                 peaks = np.delete(peaks, ind)
+                removed_peak += 1
+            # check if the interval between peaks is really too short
+            elif (peaks[ind + 1] - peaks[ind]) < thres or (peaks[ind] - peaks[ind - 1]) < thres:
+                peaks = np.delete(peaks, ind)
+                removed_peak += 1
             else:
-                ind += 1
+                # check if the amplitude is too low (added 2021.03.22)
+                r_seg = x[peaks[max(0, (ind - 10)):min(len(peaks) - 1, (ind + 10))]]
+                Q1 = np.percentile(r_seg, 25, interpolation='midpoint')
+                local_iqrd = stats.iqr(r_seg, interpolation='midpoint')/2
+                if x[peaks[ind]] < Q1 - local_iqrd:
+                    #print("ignore %f" % peaks[ind])
+                    peaks = np.delete(peaks, ind)
+                    removed_peak += 1
+                else:
+                    ind += 1
         else:
             ind += 1
-
+    print("Removed %d R peaks with too short intervals or too low amplitude"%removed_peak)
     #print(peaks.shape)
     newpeaks = peaks[[0].extend(peaks)]
     newpeaks = newpeaks.astype(int)
@@ -238,7 +262,7 @@ def interpolate(values, value_times, sampling_rate=1000):
 
     return(signal)
 
-def run(input_file, target_channel, output_dir, isplot):
+def run(input_file, target_channel, output_dir, isplot, isload=False):
 
     input_file = Path(input_file)
     output_dir = Path(output_dir)
@@ -263,8 +287,7 @@ def run(input_file, target_channel, output_dir, isplot):
     preproc_fname_csv = preproc_dir / (target_channel + "_preproc_" + file_name + ".csv")
     preproc_fname_txt = preproc_dir / (target_channel + "_preproc_" + file_name + ".txt")
 
-    if not preproc_fname_pkl.exists():
-
+    if not preproc_fname_pkl.exists() or not isload:
         preproc_dir.mkdir(parents=True, exist_ok=True)
         print("Rpeak processing: Preprocessing PPG data...")
         df = ppg_preprocess(target_data['signals'], sampling_rate)
@@ -336,6 +359,8 @@ if __name__=='__main__':
     parser.add_argument('-o', '--output_dir', help='directory to store output files. default: ./output', default='./output')
     parser.add_argument('-c', '--channel_name', help='name of PPG channel. default: PPG', default='PPG')
     parser.add_argument('-p', '--plot', help='option to plot time series of heart rate and detected R peaks', action="store_true")
+    parser.add_argument('-l', '--load', help='option to load previous saved R peaks',
+                        action="store_true")
 
     args = parser.parse_args()
 
@@ -343,8 +368,8 @@ if __name__=='__main__':
     output_dir = args.output_dir #Path("/mnt/hdd8T/Projects/COI_IAPS2/")
     ppg_channel_name = args.channel_name #'PPG'
     isplot = args.plot #True
-
-    run(signal_file, ppg_channel_name, output_dir, isplot)
+    isload = args.load #True
+    run(signal_file, ppg_channel_name, output_dir, isplot, isload)
 
 
 

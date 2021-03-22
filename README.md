@@ -41,6 +41,9 @@ Name of PPG channel. default: PPG
 ##### -p, --plot
 Option to plot time series of heart rate and detected R peaks
   
+##### -l, --load
+Option to load preprocessed data from previously saved files
+
 #### Outputs:
 
 ##### 1. preprocessed signals:
@@ -64,6 +67,6 @@ Option to plot time series of heart rate and detected R peaks
 
 Compute R peaks from the channel named "PPG". The R peak detection results are saved in ./output
 
-> python get_rpeaks.py -i subj1_run1.vhdr -o "preprocessed_file/subj1" -c "ppg1" -p       
+> python get_rpeaks.py -i subj1_run1.vhdr -o "preprocessed_file/subj1" -c "ppg1" -p      
 
 Compute R peaks from the channel named "ppg1". The R peak detection results and the figures are saved in ./preprocessed_file/subj1. 
